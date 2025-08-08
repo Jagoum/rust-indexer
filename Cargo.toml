@@ -2,10 +2,10 @@
 name = "rust-indexer"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <you@example.com>"] # <-- TODO: Change this!
+authors = ["Richmond Jagoum <jagoum24@gmail.com>"] # <-- TODO: Change this!
 description = "A command-line tool to analyze a Rust project's source code and populate a Neo4j graph database with its structure and relationships."
 license = "MIT" # Or "Apache-2.0"
-repository = "https://github.com/your-username/rust-indexer" # <-- TODO: Change this!
+repository = "https://github.com/Jagoum/rust-indexer" # <-- TODO: Change this!
 readme = "README.md"
 keywords = ["neo4j", "graph", "indexer", "parser", "ast"]
 categories = ["command-line-utilities", "development-tools"]
