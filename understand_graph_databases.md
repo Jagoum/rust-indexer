@@ -110,8 +110,8 @@ Let's model a simple social network where users can write posts and comment on t
 ```mermaid
 graph TD
     subgraph "Social Network Model"
-        User1(User: Alice) -- WROTE --> Post1(Post: "My first post!");
-        User2(User: Bob) -- WROTE --> Post2(Post: "Hello world!");
+        User1(User: Alice) -- WROTE --> Post1("Post: "My first post!"");
+        User2(User: Bob) -- WROTE --> Post2("Post: "Hello world!"");
         User2 -- COMMENTED_ON --> Post1;
         User1 -- LIKES --> Post2;
     end
