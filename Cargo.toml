@@ -1,0 +1,21 @@
+[package]
+name = "rust-indexer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <you@example.com>"] # <-- TODO: Change this!
+description = "A command-line tool to analyze a Rust project's source code and populate a Neo4j graph database with its structure and relationships."
+license = "MIT" # Or "Apache-2.0"
+repository = "https://github.com/your-username/rust-indexer" # <-- TODO: Change this!
+readme = "README.md"
+keywords = ["neo4j", "graph", "indexer", "parser", "ast"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+anyhow = "1.0.98"
+clap = { version = "4.5.43", features = ["derive", "env"] }
+dotenv = "0.15.0"
+futures = "0.3.31"
+neo4rs = "0.8.0"
+syn = { version = "2.0.104", features = ["full", "extra-traits"] }
+tokio = { version = "1.47.1", features = ["full"] }
+walkdir = "2.5.0"
