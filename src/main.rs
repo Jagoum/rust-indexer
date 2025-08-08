@@ -27,11 +27,19 @@ struct Cli {
     password: String,
 }
 
+/// Represents the different kinds of interactions we can find in the code.
 enum Interaction {
+    /// A call to a function, e.g., `my_function()`.
     FunctionCall(String),
+    /// An instantiation of a struct, e.g., `User { ... }`.
     StructInstantiation(String),
 }
 
+/// Main entry point for the application.
+///
+/// This function parses command-line arguments, connects to the Neo4j database,
+/// and iterates through all `.rs` files in the target project directory to
+/// begin the indexing process.
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     // Load .env file for fallback configuration
@@ -88,11 +96,17 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+/// Processes the Abstract Syntax Tree (AST) of a single Rust file.
+///
+/// This function iterates through the top-level items of a file's AST
+/// (like functions, structs, and traits) and creates the corresponding nodes
+/// and relationships in the Neo4j database.
 async fn process_ast(graph: &Graph, project: &str, file_path: &str, ast: syn::File) -> Result<()> {
     for item in ast.items {
         match item {
             Item::Fn(item_fn) => {
                 let func_name = item_fn.sig.ident.to_string();
+                // Create the :Function node and link it to its file.
                 graph
                     .run(
                         query(
@@ -108,11 +122,13 @@ async fn process_ast(graph: &Graph, project: &str, file_path: &str, ast: syn::Fi
                     )
                     .await?;
 
+                // Find all interactions within the function body.
                 let mut interactions = Vec::new();
                 for stmt in &item_fn.block.stmts {
                     find_interactions_in_stmt(stmt, &mut interactions);
                 }
 
+                // Create relationships for each found interaction.
                 for interaction in interactions {
                     match interaction {
                         Interaction::FunctionCall(callee_name) => {
@@ -185,6 +201,7 @@ async fn process_ast(graph: &Graph, project: &str, file_path: &str, ast: syn::Fi
                     .await?;
             }
             Item::Impl(item_impl) => {
+                // Find `impl Trait for Struct` blocks.
                 if let Some(trait_path) = item_impl.trait_.as_ref().map(|t| &t.1) {
                     let struct_type = &*item_impl.self_ty;
                     if let (Some(trait_ident), Some(struct_ident)) = (trait_path.segments.last(), get_ident_from_type(struct_type)) {
@@ -211,6 +228,8 @@ async fn process_ast(graph: &Graph, project: &str, file_path: &str, ast: syn::Fi
     Ok(())
 }
 
+/// Helper function to extract the identifier from a `syn::Type`.
+/// This is used to get the name of a struct from an `impl` block.
 fn get_ident_from_type(ty: &syn::Type) -> Option<String> {
     if let syn::Type::Path(type_path) = ty {
         if let Some(segment) = type_path.path.segments.last() {
@@ -220,6 +239,10 @@ fn get_ident_from_type(ty: &syn::Type) -> Option<String> {
     None
 }
 
+/// Synchronously and recursively finds interactions within a statement.
+///
+/// This function acts as a dispatcher, checking for interactions in different
+/// statement types, such as `let` bindings and expressions.
 fn find_interactions_in_stmt(stmt: &Stmt, interactions: &mut Vec<Interaction>) {
     match stmt {
         Stmt::Local(local) => {
@@ -234,6 +257,10 @@ fn find_interactions_in_stmt(stmt: &Stmt, interactions: &mut Vec<Interaction>) {
     }
 }
 
+/// Synchronously and recursively finds interactions within an expression.
+///
+/// This is the core of the analysis, traversing the expression tree to find
+/// function calls, struct instantiations, and other patterns of interest.
 fn find_interactions_in_expr(expr: &Expr, interactions: &mut Vec<Interaction>) {
     match expr {
         Expr::Call(ExprCall { func, .. }) => {
