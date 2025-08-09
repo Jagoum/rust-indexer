@@ -184,9 +184,9 @@ graph TD
         U1(User: Alice)
         U2(User: Bob)
         P1(Project: RustIndexer)
-        T1(Task: "Publish Crate")
-        T2(Task: "Write Docs")
-        B1(Bug: "Crash on Startup")
+        T1("Task: "Publish Crate"")
+        T2("Task: "Write Docs"")
+        B1("Bug: "Crash on Startup"")
 
         U1 -- MANAGES --> P1
         U2 -- ASSIGNED_TO --> T1
